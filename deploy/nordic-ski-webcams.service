@@ -1,0 +1,21 @@
+[Unit]
+Description=Nordic Ski Webcams Telegram Bot
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=user
+WorkingDirectory=/home/user/src/neu_al_pirineu
+EnvironmentFile=/home/user/src/neu_al_pirineu/.env
+ExecStart=/home/user/.local/bin/uv run bot.py
+Restart=always
+RestartSec=10
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=nordic-ski-webcams
+
+[Install]
+WantedBy=multi-user.target

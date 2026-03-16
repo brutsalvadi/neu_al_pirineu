@@ -1,0 +1,851 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nordic Ski Webcams - Pirineos Catalán, Ariège & Neiges Catalanes</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #1a472a;
+            --accent: #e8f1f5;
+            --secondary: #2d5a3d;
+            --text-dark: #1a1a1a;
+            --text-light: #f5f5f5;
+            --border: #c0d8e0;
+            --success: #2ecc71;
+            --warning: #f39c12;
+            --danger: #e74c3c;
+        }
+
+        body {
+            font-family: 'Georgia', serif;
+            background: linear-gradient(135deg, #f0f4f8 0%, #d9e8f0 100%);
+            color: var(--text-dark);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        header {
+            max-width: 1400px;
+            margin: 0 auto 40px;
+            text-align: center;
+            animation: slideDown 0.8s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        h1 {
+            font-size: 3em;
+            color: var(--primary);
+            margin-bottom: 10px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .subtitle {
+            font-size: 1.1em;
+            color: var(--secondary);
+            font-style: italic;
+            margin-bottom: 20px;
+        }
+
+        .header-info {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+            font-size: 0.95em;
+            color: var(--secondary);
+        }
+
+        .info-badge {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: rgba(255,255,255,0.6);
+            border-radius: 20px;
+            border: 1px solid var(--border);
+            backdrop-filter: blur(10px);
+        }
+
+        .info-badge::before {
+            content: '';
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--accent);
+            border: 2px solid var(--primary);
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .region-section {
+            margin-bottom: 50px;
+            animation: fadeIn 0.8s ease forwards;
+            opacity: 0;
+        }
+
+        .region-section:nth-child(1) { animation-delay: 0.1s; }
+        .region-section:nth-child(2) { animation-delay: 0.2s; }
+        .region-section:nth-child(3) { animation-delay: 0.3s; }
+
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+            }
+        }
+
+        .region-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 3px solid var(--primary);
+        }
+
+        .region-icon {
+            width: 50px;
+            height: 50px;
+            background: var(--primary);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            color: var(--accent);
+        }
+
+        .region-title {
+            flex: 1;
+        }
+
+        .region-name {
+            font-size: 2em;
+            color: var(--primary);
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .region-desc {
+            font-size: 0.95em;
+            color: var(--secondary);
+            font-style: italic;
+        }
+
+        .station-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .station-card {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            transition: all 0.3s ease;
+            border-left: 5px solid var(--primary);
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .station-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 30px rgba(0,0,0,0.15);
+            border-left-color: var(--accent);
+        }
+
+        .station-header {
+            padding: 20px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: var(--text-light);
+        }
+
+        .station-name {
+            font-size: 1.5em;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .station-meta {
+            display: flex;
+            gap: 15px;
+            font-size: 0.85em;
+            opacity: 0.9;
+            flex-wrap: wrap;
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .webcams-container {
+            padding: 20px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .webcam-feed-container {
+            margin-bottom: 15px;
+            border-radius: 8px;
+            overflow: hidden;
+            background: #f0f0f0;
+            aspect-ratio: 16 / 9;
+            border: 2px solid var(--border);
+            position: relative;
+        }
+
+        .webcam-feed-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .webcam-feed-container.loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        .live-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 0.8em;
+            background: rgba(26, 71, 42, 0.85);
+            color: white;
+            padding: 6px 10px;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-weight: 600;
+        }
+
+        .live-badge::before {
+            content: '●';
+            display: inline-block;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .webcam-list {
+            margin-bottom: 15px;
+        }
+
+        .webcam-item {
+            padding: 12px;
+            background: var(--accent);
+            border-radius: 8px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-left: 4px solid var(--primary);
+            transition: background 0.3s ease;
+        }
+
+        .webcam-item:hover {
+            background: #d4e5ed;
+        }
+
+        .webcam-item.first::before {
+            content: '📡 ';
+            margin-right: 5px;
+        }
+
+        .webcam-name {
+            font-weight: 600;
+            color: var(--primary);
+            flex: 1;
+            font-size: 0.95em;
+        }
+
+        .webcam-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            background: var(--primary);
+            color: var(--text-light);
+            border-radius: 6px;
+            text-decoration: none;
+            font-size: 0.85em;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            font-family: inherit;
+        }
+
+        .webcam-link:hover {
+            background: var(--secondary);
+            transform: translateX(3px);
+        }
+
+        .webcam-link::after {
+            content: '→';
+        }
+
+        .empty-message {
+            padding: 20px;
+            text-align: center;
+            background: var(--accent);
+            border-radius: 8px;
+            color: var(--secondary);
+            font-style: italic;
+            font-size: 0.95em;
+        }
+
+        .station-footer {
+            padding: 15px 20px;
+            background: var(--accent);
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.9em;
+        }
+
+        .webcam-count {
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .webcam-count.active {
+            color: var(--success);
+        }
+
+        .webcam-count.inactive {
+            color: var(--danger);
+        }
+
+        .visit-btn {
+            padding: 8px 16px;
+            background: var(--primary);
+            color: var(--text-light);
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 0.9em;
+        }
+
+        .visit-btn:hover {
+            background: var(--secondary);
+            transform: scale(1.05);
+        }
+
+        .footer {
+            text-align: center;
+            padding: 30px 20px;
+            color: var(--secondary);
+            margin-top: 50px;
+            font-size: 0.95em;
+        }
+
+        .footer-note {
+            margin-top: 15px;
+            font-size: 0.85em;
+            opacity: 0.8;
+        }
+
+        .legend {
+            max-width: 1400px;
+            margin: 0 auto 40px;
+            padding: 20px;
+            background: rgba(255,255,255,0.7);
+            border-radius: 12px;
+            border-left: 5px solid var(--primary);
+        }
+
+        .legend-title {
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 12px;
+        }
+
+        .legend-items {
+            display: flex;
+            gap: 30px;
+            flex-wrap: wrap;
+            font-size: 0.95em;
+            color: var(--secondary);
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2em;
+            }
+
+            .header-info {
+                gap: 15px;
+            }
+
+            .station-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .region-name {
+                font-size: 1.5em;
+            }
+
+            .station-footer {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>⛷️ Nordic Ski Webcams</h1>
+        <p class="subtitle">Real-time views from Catalonian & French Pyrenean resorts</p>
+        <div class="header-info">
+            <div class="info-badge">
+                <span>🏔️ 11 Stations</span>
+            </div>
+            <div class="info-badge">
+                <span>📍 3 Regions</span>
+            </div>
+            <div class="info-badge">
+                <span>🎥 40+ Webcams</span>
+            </div>
+        </div>
+    </header>
+
+    <div class="legend">
+        <div class="legend-title">📺 About this page</div>
+        <div class="legend-items">
+            <div class="legend-item">
+                <span>🏔️ Catalan stations: live snapshots from projecte4estacions.com</span>
+            </div>
+            <div class="legend-item">
+                <span>🇫🇷 French stations: live snapshots from bergfex.at</span>
+            </div>
+            <div class="legend-item">
+                <span>🔗 Click "View" to see all webcams on official station sites</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- PIRINEO CATALÁN -->
+        <div class="region-section">
+            <div class="region-header">
+                <div class="region-icon">🏔️</div>
+                <div class="region-title">
+                    <div class="region-name">Pirineo Catalán</div>
+                    <div class="region-desc">Spanish Catalan Pyrenees - 7 Nordic Ski Stations</div>
+                </div>
+            </div>
+
+            <div class="station-grid">
+                <!-- Aransa -->
+                <div class="station-card">
+                    <div class="station-header">
+                        <div class="station-name">Aransa</div>
+                        <div class="station-meta">
+                            <div class="meta-item">📏 30/32 km open</div>
+                            <div class="meta-item">❄️ 150 cm</div>
+                        </div>
+                    </div>
+                    <div class="webcams-container">
+                        <div class="webcam-feed-container">
+                            <img src="https://app.projecte4estacions.com/snapshots/aransa-estacio-data.jpg" alt="Aransa webcam">
+                            <div class="live-badge">Live</div>
+                        </div>
+                        <div class="webcam-list">
+                            <div class="webcam-item first">
+                                <span class="webcam-name">Estació</span>
+                                <a class="webcam-link" href="https://www.totnordic.com/webcams/webcam-aransa/" target="_blank">View</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="station-footer">
+                        <span class="webcam-count active">1 webcam</span>
+                        <a href="https://www.totnordic.com/webcams/webcam-aransa/" class="visit-btn" target="_blank">Visit Station</a>
+                    </div>
+                </div>
+
+                <!-- Guils Fontanera -->
+                <div class="station-card">
+                    <div class="station-header">
+                        <div class="station-name">Guils Fontanera</div>
+                        <div class="station-meta">
+                            <div class="meta-item">📏 -/33 km</div>
+                            <div class="meta-item">❄️ 50 cm</div>
+                        </div>
+                    </div>
+                    <div class="webcams-container">
+                        <div class="webcam-feed-container">
+                            <img src="https://app.projecte4estacions.com/snapshots/guils-data.jpg" alt="Guils Fontanera webcam">
+                            <div class="live-badge">Live</div>
+                        </div>
+                        <div class="webcam-list">
+                            <div class="webcam-item first">
+                                <span class="webcam-name">Recepció (1905m)</span>
+                                <a class="webcam-link" href="https://www.guils.com/webcam/" target="_blank">View</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="station-footer">
+                        <span class="webcam-count active">1 webcam</span>
+                        <a href="https://www.guils.com/webcam/" class="visit-btn" target="_blank">Visit Station</a>
+                    </div>
+                </div>
+
+                <!-- Lles de Cerdanya -->
+                <div class="station-card">
+                    <div class="station-header">
+                        <div class="station-name">Lles de Cerdanya</div>
+                        <div class="station-meta">
+                            <div class="meta-item">📏 28/34.2 km open</div>
+                            <div class="meta-item">❄️ 150 cm</div>
+                        </div>
+                    </div>
+                    <div class="webcams-container">
+                        <div class="webcam-feed-container">
+                            <img src="https://app.projecte4estacions.com/snapshots/lles-estacio-data.jpg" alt="Lles de Cerdanya webcam">
+                            <div class="live-badge">Live</div>
+                        </div>
+                        <div class="webcam-list">
+                            <div class="webcam-item first">
+                                <span class="webcam-name">Cap del Rec</span>
+                                <a class="webcam-link" href="https://lles.net/webcams/" target="_blank">View</a>
+                            </div>
+                            <div class="webcam-item">
+                                <span class="webcam-name">Terrassa Cafeteria</span>
+                                <a class="webcam-link" href="https://lles.net/webcams/" target="_blank">View</a>
+                            </div>
+                            <div class="webcam-item">
+                                <span class="webcam-name">Control Accés</span>
+                                <a class="webcam-link" href="https://lles.net/webcams/" target="_blank">View</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="station-footer">
+                        <span class="webcam-count active">3 webcams</span>
+                        <a href="https://lles.net/webcams/" class="visit-btn" target="_blank">Visit Station</a>
+                    </div>
+                </div>
+
+                <!-- Sant Joan de l'Erm -->
+                <div class="station-card">
+                    <div class="station-header">
+                        <div class="station-name">Sant Joan de l'Erm</div>
+                        <div class="station-meta">
+                            <div class="meta-item">📏 10/42 km open</div>
+                            <div class="meta-item">❄️ 100 cm</div>
+                        </div>
+                    </div>
+                    <div class="webcams-container">
+                        <div class="webcam-feed-container">
+                            <img src="https://app.projecte4estacions.com/snapshots/santjoan-estacio-data.jpg" alt="Sant Joan de l'Erm webcam">
+                            <div class="live-badge">Live</div>
+                        </div>
+                        <div class="webcam-list">
+                            <div class="webcam-item first">
+                                <span class="webcam-name">Estació</span>
+                                <a class="webcam-link" href="https://www.totnordic.com/webcams/webcam-sant-joan-de-lerm/" target="_blank">View</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="station-footer">
+                        <span class="webcam-count active">1 webcam</span>
+                        <a href="https://www.totnordic.com/webcams/webcam-sant-joan-de-lerm/" class="visit-btn" target="_blank">Visit Station</a>
+                    </div>
+                </div>
+
+                <!-- Tavascán (Nórdico) -->
+                <div class="station-card">
+                    <div class="station-header">
+                        <div class="station-name">Tavascán (Nórdico)</div>
+                        <div class="station-meta">
+                            <div class="meta-item">📏 -/15 km</div>
+                            <div class="meta-item">❄️ 180 cm</div>
+                        </div>
+                    </div>
+                    <div class="webcams-container">
+                        <div class="webcam-feed-container">
+                            <img src="https://app.projecte4estacions.com/imatge/tavascan-data.jpg" alt="Tavascán webcam">
+                            <div class="live-badge">Live</div>
+                        </div>
+                        <div class="webcam-list">
+                            <div class="webcam-item first">
+                                <span class="webcam-name">Estació</span>
+                                <a class="webcam-link" href="https://www.totnordic.com/webcams/webcam-tavascan/" target="_blank">View</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="station-footer">
+                        <span class="webcam-count active">1 webcam</span>
+                        <a href="https://www.totnordic.com/webcams/webcam-tavascan/" class="visit-btn" target="_blank">Visit Station</a>
+                    </div>
+                </div>
+
+                <!-- Tuixent - La Vansa -->
+                <div class="station-card">
+                    <div class="station-header">
+                        <div class="station-name">Tuixent - La Vansa</div>
+                        <div class="station-meta">
+                            <div class="meta-item">📏 30/30 km open</div>
+                            <div class="meta-item">❄️ 210 cm</div>
+                        </div>
+                    </div>
+                    <div class="webcams-container">
+                        <div class="webcam-feed-container">
+                            <img src="https://app.projecte4estacions.com/snapshots/tuixentlavansa-data.jpg" alt="Tuixent - La Vansa webcam">
+                            <div class="live-badge">Live</div>
+                        </div>
+                        <div class="webcam-list">
+                            <div class="webcam-item first">
+                                <span class="webcam-name">Tallafocs</span>
+                                <a class="webcam-link" href="https://www.tuixent-lavansa.com/en-directe/" target="_blank">View</a>
+                            </div>
+                            <div class="webcam-item">
+                                <span class="webcam-name">Zona Debutants</span>
+                                <a class="webcam-link" href="https://www.tuixent-lavansa.com/en-directe/" target="_blank">View</a>
+                            </div>
+                            <div class="webcam-item">
+                                <span class="webcam-name">Pàrquing</span>
+                                <a class="webcam-link" href="https://www.tuixent-lavansa.com/en-directe/" target="_blank">View</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="station-footer">
+                        <span class="webcam-count active">3 webcams</span>
+                        <a href="https://www.tuixent-lavansa.com/en-directe/" class="visit-btn" target="_blank">View All</a>
+                    </div>
+                </div>
+
+                <!-- Virós-Vallferrera -->
+                <div class="station-card">
+                    <div class="station-header">
+                        <div class="station-name">Virós-Vallferrera</div>
+                        <div class="station-meta">
+                            <div class="meta-item">📏 -/20 km</div>
+                            <div class="meta-item">❄️ - cm</div>
+                        </div>
+                    </div>
+                    <div class="webcams-container">
+                        <div class="webcam-feed-container">
+                            <img src="https://app.projecte4estacions.com/snapshots/viros-estacio-data.jpg" alt="Virós-Vallferrera webcam">
+                            <div class="live-badge">Live</div>
+                        </div>
+                        <div class="webcam-list">
+                            <div class="webcam-item first">
+                                <span class="webcam-name">Estació</span>
+                                <a class="webcam-link" href="https://www.totnordic.com/webcams/webcam-viros-vallferrera/" target="_blank">View</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="station-footer">
+                        <span class="webcam-count active">1 webcam</span>
+                        <a href="https://www.totnordic.com/webcams/webcam-viros-vallferrera/" class="visit-btn" target="_blank">Visit Station</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ARIÈGE PYRÉNÉES -->
+        <div class="region-section">
+            <div class="region-header">
+                <div class="region-icon">🇫🇷</div>
+                <div class="region-title">
+                    <div class="region-name">Ariège Pyrénées</div>
+                    <div class="region-desc">Southern France - 2 Nordic Ski Stations</div>
+                </div>
+            </div>
+
+            <div class="station-grid">
+                <!-- Beille -->
+                <div class="station-card">
+                    <div class="station-header">
+                        <div class="station-name">Beille</div>
+                        <div class="station-meta">
+                            <div class="meta-item">📏 17.1/40.2 km open</div>
+                            <div class="meta-item">❄️ 120 cm</div>
+                        </div>
+                    </div>
+                    <div class="webcams-container">
+                        <div class="webcam-feed-container">
+                            <img src="https://images.bergfex.at/webcams/?id=25058&format=4" alt="Beille webcam">
+                            <div class="live-badge">Live</div>
+                        </div>
+                        <div class="webcam-list">
+                            <div class="webcam-item first">
+                                <span class="webcam-name">Vue Panoramique (1810m)</span>
+                                <a class="webcam-link" href="https://www.beille.fr/webcams.html" target="_blank">View</a>
+                            </div>
+                            <div class="webcam-item">
+                                <span class="webcam-name">Piste de Luge (1800m)</span>
+                                <a class="webcam-link" href="https://www.beille.fr/webcams.html" target="_blank">View</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="station-footer">
+                        <span class="webcam-count active">2 webcams</span>
+                        <a href="https://www.beille.fr/webcams.html" class="visit-btn" target="_blank">View All</a>
+                    </div>
+                </div>
+
+                <!-- Chioula -->
+                <div class="station-card">
+                    <div class="station-header">
+                        <div class="station-name">Chioula</div>
+                        <div class="station-meta">
+                            <div class="meta-item">📏 23.7/48 km open</div>
+                            <div class="meta-item">❄️ 85 cm</div>
+                        </div>
+                    </div>
+                    <div class="webcams-container">
+                        <div class="webcam-feed-container">
+                            <img src="https://images.bergfex.at/webcams/?id=23844&format=4" alt="Chioula webcam">
+                            <div class="live-badge">Live</div>
+                        </div>
+                        <div class="webcam-list">
+                            <div class="webcam-item first">
+                                <span class="webcam-name">Chioula (1240m)</span>
+                                <a class="webcam-link" href="https://www.chioula.fr/webcams-chioula.html" target="_blank">View</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="station-footer">
+                        <span class="webcam-count active">1 webcam</span>
+                        <a href="https://www.chioula.fr/webcams-chioula.html" class="visit-btn" target="_blank">View All</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- NEIGES CATALANES -->
+        <div class="region-section">
+            <div class="region-header">
+                <div class="region-icon">❄️</div>
+                <div class="region-title">
+                    <div class="region-name">Neiges Catalanes</div>
+                    <div class="region-desc">Southern France (Catalan Pyrenees) - 2 Nordic Ski Stations</div>
+                </div>
+            </div>
+
+            <div class="station-grid">
+                <!-- Capcir -->
+                <div class="station-card">
+                    <div class="station-header">
+                        <div class="station-name">Capcir</div>
+                        <div class="station-meta">
+                            <div class="meta-item">📏 36.3/56 km open</div>
+                            <div class="meta-item">❄️ 160 cm</div>
+                        </div>
+                    </div>
+                    <div class="webcams-container">
+                        <div class="webcam-feed-container">
+                            <img src="http://91.121.33.165/~cam/coldelallose.jpg" alt="Capcir webcam">
+                            <div class="live-badge">Live</div>
+                        </div>
+                        <div class="webcam-list">
+                            <div class="webcam-item first">
+                                <span class="webcam-name">Col de la Llose</span>
+                                <a class="webcam-link" href="https://www.capcir-nordique.com/fr/accueil/webcams" target="_blank">View</a>
+                            </div>
+                            <div class="webcam-item">
+                                <span class="webcam-name">Col de la Quillane</span>
+                                <a class="webcam-link" href="https://www.capcir-nordique.com/fr/accueil/webcams" target="_blank">View</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="station-footer">
+                        <span class="webcam-count active">2 webcams</span>
+                        <a href="https://www.capcir-nordique.com/fr/accueil/webcams" class="visit-btn" target="_blank">View All</a>
+                    </div>
+                </div>
+
+                <!-- Font-Romeu Pyrénées 2000 -->
+                <div class="station-card">
+                    <div class="station-header">
+                        <div class="station-name">Font-Romeu Pyrénées 2000</div>
+                        <div class="station-meta">
+                            <div class="meta-item">📏 -/107.1 km open</div>
+                            <div class="meta-item">❄️ 100 cm</div>
+                        </div>
+                    </div>
+                    <div class="webcams-container">
+                        <div class="webcam-feed-container">
+                            <img src="https://images.bergfex.at/webcams/?id=24389&format=4" alt="Font-Romeu webcam">
+                            <div class="live-badge">Live</div>
+                        </div>
+                        <div class="webcam-list">
+                            <div class="webcam-item first">
+                                <span class="webcam-name">Pyrénées 2000 (1700m)</span>
+                                <a class="webcam-link" href="https://www.altiservice.com/font-romeu-pyrenees-2000/webcams?id=221" target="_blank">View</a>
+                            </div>
+                            <div class="webcam-item">
+                                <span class="webcam-name">Les Airelles (1937m)</span>
+                                <a class="webcam-link" href="https://www.altiservice.com/font-romeu-pyrenees-2000/webcams?id=221" target="_blank">View</a>
+                            </div>
+                            <div class="webcam-item">
+                                <span class="webcam-name">Haut du Roc de la Calme (2213m)</span>
+                                <a class="webcam-link" href="https://www.altiservice.com/font-romeu-pyrenees-2000/webcams?id=221" target="_blank">View</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="station-footer">
+                        <span class="webcam-count active">10 webcams</span>
+                        <a href="https://www.altiservice.com/font-romeu-pyrenees-2000/webcams?id=221" class="visit-btn" target="_blank">View All</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>📊 <strong>Live Nordic Ski Conditions & Webcams</strong></p>
+        <p class="footer-note">Catalan stations: webcams from <a href="https://www.totnordic.com/webcams/" style="color: var(--primary); text-decoration: none; font-weight: 600;" target="_blank">totnordic.com</a> &amp; <a href="https://app.projecte4estacions.com" style="color: var(--primary); text-decoration: none; font-weight: 600;" target="_blank">projecte4estacions</a></p>
+        <p class="footer-note">French stations: webcams from <a href="https://www.bergfex.com" style="color: var(--primary); text-decoration: none; font-weight: 600;" target="_blank">bergfex.com</a></p>
+    </div>
+
+</body>
+</html>
